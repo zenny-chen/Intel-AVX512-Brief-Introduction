@@ -191,3 +191,10 @@ vpaddd zmm2 {k3}, zmm0, zmm1
 
 此中间结果然后被写入到目的向量寄存器zmm2，使用屏蔽操作寄存器k3作为写屏蔽，产生以下最终结果：
 
+zmm2 =    
+\[ 0xAAAAAAAA 0xAAAAAAAA 0x00000010 0x0000000F \] (bytes 15 through 0)    
+\[ 0xBBBBBBBB 0xBBBBBBBB 0xBBBBBBBB 0xBBBBBBBB \] (bytes 31 through 16)    
+\[ 0x0000001A 0x00000019 0x00000018 0x00000017 \] (bytes 47 through 32)     
+\[ 0x0000001E 0xDDDDDDDD 0xDDDDDDDD 0xDDDDDDDD \] (bytes 63 through 48)
+
+注意，对于一条数据元素宽度为64位的指令（比如`vaddpd`），屏蔽操作寄存器k3中只有8位LSB（最低有效位）才会被用于标识谓词操作，对应源/目的向量中8个元素的每一个。
