@@ -150,4 +150,36 @@ EVEX编码的AVX-512指令支持增强的向量编程环境。增强的向量编
 
 ##### 15.6.1.2 屏蔽操作寄存器的使用样例
 
+以下例子描述了带有谓词断言的向量加法操作以及带有谓词断言的将相加后的结果更新到目的操作数。向量寄存器zmm0、zmm1、zmm2，以及k3的初始状态为：
+
+MSB........................................LSB
+
+zmm0 =    
+\[ 0x00000003 0x00000002 0x00000001 0x00000000 \] (bytes 15 through 0)    
+\[ 0x00000007 0x00000006 0x00000005 0x00000004 \] (bytes 31 through 16)    
+\[ 0x0000000B 0x0000000A 0x00000009 0x00000008 \] (bytes 47 through 32)    
+\[ 0x0000000F 0x0000000E 0x0000000D 0x0000000C \] (bytes 63 through 48)    
+
+zmm1 =
+\[ 0x0000000F 0x0000000F 0x0000000F 0x0000000F \] (bytes 15 through 0)    
+\[ 0x0000000F 0x0000000F 0x0000000F 0x0000000F \] (bytes 31 through 16)    
+\[ 0x0000000F 0x0000000F 0x0000000F 0x0000000F \] (bytes 47 through 32)    
+\[ 0x0000000F 0x0000000F 0x0000000F 0x0000000F \] (bytes 63 through 48)
+
+zmm2 =
+\[ 0xAAAAAAAA 0xAAAAAAAA 0xAAAAAAAA 0xAAAAAAAA \] (bytes 15 through 0)    
+\[ 0xBBBBBBBB 0xBBBBBBBB 0xBBBBBBBB 0xBBBBBBBB \] (bytes 31 through 16)    
+\[ 0xCCCCCCCC 0xCCCCCCCC 0xCCCCCCCC 0xCCCCCCCC \] (bytes 47 through 32)    
+\[ 0xDDDDDDDD 0xDDDDDDDD 0xDDDDDDDD 0xDDDDDDDD \] (bytes 63 through 48)
+
+k3 = 0x8F03 (1000 1111 0000 0011)
+
+一个担任谓词操作数的屏蔽操作寄存器表达为一个用花括号包围的修饰符，在Intel汇编语法中跟在第一个操作数的后面。给定上述状态，我们可以执行以下指令：
+
+```asm
+vpaddd zmm2 {k3}, zmm0, zmm1
+```
+
+
+
 
