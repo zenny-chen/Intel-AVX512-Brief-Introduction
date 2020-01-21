@@ -263,4 +263,6 @@ vmovaps [rax], {k3}, zmm19
   优先权 | 在MXCSR.RC之上 | 在EVEX.L'L之上 | 默认
   适用范围 | 512位，寄存器-寄存器，标量寄存器-寄存器 | ROUNDPx，ROUNDSx，VCVTPS2PH，VRNDSCALExx | 所有SIMD操作数，向量长度
 
-AVX-512中的静态舍入覆盖也暗示了“抑制所有异常”（SAE）属性。
+AVX-512中的静态舍入覆盖也暗示了“抑制所有异常”（SAE）属性。SAE的效果就好比所有的MXCSR屏蔽位被置1了，并且没有MXCSR标志被更新。通过EVEX而不用SAE来使用静态舍入模式是不被支持的。
+
+
