@@ -254,6 +254,13 @@ vmovaps [rax], {k3}, zmm19
 
   舍入接口 | 静态舍入覆盖 | imm8嵌入舍入覆盖 | MXCSR舍入控制
   ---- | ---- | ---- | ----
-  单元格内容  | 单元格内容 | 单元格内容 
-  单元格内容  | 单元格内容 | 单元格内容
+  语义要求 | FP舍入 | FP舍入 | FP舍入 
+  前缀要求 | EVEX.B = 1 | N/A | N/A
+  舍入控制 | EVEX.L'L | IMM8[1:0]或MXCSR.RC（依赖于IMM8[2]） | MXCSR.RC
+  抑制所有异常（SAE） | 隐式的 | 不 | 不
+  SIMD FP异常 #XF | 所有都抑制 | 可能引发#I，#P（除非SPE置1） | MXCSR屏蔽控制
+  MXCSR标志更新 | 不 | 是（除了PE，如果SPE置1的话） | 是
+  优先权 | 在MXCSR.RC之上 | 在EVEX.L'L之上 | 默认
+  适用范围 | 512位，寄存器-寄存器，标量寄存器-寄存器 | ROUNDPx，ROUNDSx，VCVTPS2PH，VRNDSCALExx | 所有SIMD操作数，向量长度
 
+AVX-512中的静态舍入覆盖也暗示了“抑制所有异常”（SAE）属性。
