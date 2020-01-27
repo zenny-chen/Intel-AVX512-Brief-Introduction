@@ -290,3 +290,20 @@ vaddps zmm7 {k6}, zmm2, zmm4, {rd-sae}
 
 上述指令将会执行向量zmm2和zmm4的单精度浮点向量加法，采用舍入到-inf的舍入模式，使用k6作为条件写屏蔽，将结果存放到zmm7。
 
+注意，上述指令执行时MXCSR.RM位被忽略，并且不受该指令执行结果的影响。
+
+对于指令实例，静态舍入模式不被允许的例子如下所示：
+
+```asm
+; 舍入模式已经在指令立即数中指定了
+vrndscaleps zmm7 {k6}, zmm2, 0x00
+
+; 带有存储器操作数的指令
+vmulps zmm7 {k6}, zmm2, [rax], {rd-sae}
+
+; 向量长度不同于MAXVL（512位）的指令
+vaddps ymm7 {k6}, ymm2, ymm4, {rd-sae}
+```
+
+#### 15.6.5 压缩的Disp\*N编码
+
