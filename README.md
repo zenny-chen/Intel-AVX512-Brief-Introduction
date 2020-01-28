@@ -329,3 +329,7 @@ vaddps zmm7, zmm2, disp8[membase + index*8]
 vbroadcastf32x4 zmm7, disp8[membase + index*8]
 ```
 
+在上述的VBROADCASTF32x4指令中，存储器被取作为4个32位实例的四元组。因而通常可以被压缩的最低地址位为4，对应于四元组宽度：2<sup>4</sup> = 16个字节（4x32位）。从而N = 2<sup>4</sup>。
+
+对于仅更新目的操作数中一个元素，或是源操作数元素被分别独立获取的EVEX编码的指令，可被压缩的最低地址位个数一般是数据元素的字节宽度，因而N = 2<sup>(width)</sup>。
+
