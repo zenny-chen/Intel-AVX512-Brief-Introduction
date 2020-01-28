@@ -333,3 +333,20 @@ vbroadcastf32x4 zmm7, disp8[membase + index*8]
 
 对于仅更新目的操作数中一个元素，或是源操作数元素被分别独立获取的EVEX编码的指令，可被压缩的最低地址位个数一般是数据元素的字节宽度，因而N = 2<sup>(width)</sup>。
 
+这里需要注意的是，上述汇编代码中的**disp8**在真正用的时候是一个立即数。我们可以看以下几个实际的使用例子：
+
+```asm
+    vpxord  zmm0, zmm0, zmm0
+    vpaddd  zmm1, zmm0, 64[rcx + 8 * 8]
+    vpaddd  zmm2, zmm0, 128[rcx]
+
+    ; 由于这里直接取64个字节的数据，
+    ; 因此地址被压缩，
+    ; 实际计算时采用64 * disp8。
+    vpaddd  zmm3, zmm0, (64 * 255)[rcx + 8 * rax]
+```
+
+<br />
+
+## 15.7 存储器对齐
+
