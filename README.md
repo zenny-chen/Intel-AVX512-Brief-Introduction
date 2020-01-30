@@ -350,3 +350,10 @@ vbroadcastf32x4 zmm7, disp8[membase + index*8]
 
 ## 15.7 存储器对齐
 
+
+<br />
+
+# 优化手册第17章——对Intel AVX-512指令的软件优化
+
+<br >
+
