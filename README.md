@@ -350,6 +350,9 @@ vbroadcastf32x4 zmm7, disp8[membase + index*8]
 
 ## 15.7 存储器对齐
 
+对于EVEX编码的SIMD指令的存储器对齐要求类似于VEX编码的SIMD指令。对于EVEX编码的SIMD指令，应用以下三个类别的存储器对齐：
+
+• 显式对齐的、具有EVEX前缀编码的512位向量长度的SIMD加载和存储指令访问64字节的存储器（比如，`VMOVAPD`、`VMOVAPS`、`VMOVDQA`，等等）。这些指令总是需要存储器地址以64字节的边界对齐。
 
 <br />
 
