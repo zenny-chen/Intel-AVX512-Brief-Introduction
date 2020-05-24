@@ -368,7 +368,7 @@ vbroadcastf32x4 zmm7, disp8[membase + index*8]
 
 Intel高级向量扩展512（Intel® AVX-512）是以下所要描述的512位指令集扩展，由起始于Skylake服务器微架构的最近微架构、以及基于Knights Landing的Intel Xeon Phi处理器予以支持。
 
-• Intel AVX-512基础（F）    
+- Intel AVX-512基础（F）    
     —— 512位向量宽度    
     —— 32个512位长的向量寄存器    
     —— 数据扩展与数据压缩指令    
@@ -379,7 +379,12 @@ Intel高级向量扩展512（Intel® AVX-512）是以下所要描述的512位指
     —— 嵌入的广播/舍入    
     —— 超越函数的支持
     
-• Intel AVX-512冲突探测指令（CD）
+- Intel AVX-512冲突探测指令（CD）
+- Intel AVX-512指数与倒数指令（ER）
+- Intel AVX-512预取指令（PF）
+- Intel AVX-512字节与字（位宽的）指令（BW）
+- Intel AVX-512双字与四字（位宽的）指令（DQ）——新的QWORD以及计算与转换指令
+- Intel AVX-512向量长度扩展（VL）
 
 <br >
 
