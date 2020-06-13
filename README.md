@@ -605,8 +605,75 @@ loop1:
 Intel AVX-512汇编代码
 
 ```cpp
+#include <immintrin.h>
+int main(void)
+{
+    int len = 3200;
 
+    //Dynamic memory allocation with 64byte alignment
+    float* pInVector = (float *)_mm_malloc(len*sizeof(float),64);
+    float* pOutVector = (float *)_mm_malloc(len*sizeof(float),64);
+
+    //init data
+    for (int i=0; i<len; i++)
+        pInVector[i] = 1;
+
+    float cos_teta = 0.8660254037;
+    float sin_teta = 0.5;
+
+    //Static memory allocation of 16 floats with 64byte alignments
+    alignas(64) float cos_sin_teta_vec[16] = {cos_teta, sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta,
+                                              sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta,
+                                              sin_teta, cos_teta, sin_teta};
+    alignas(64) float sin_cos_teta_vec[16] = {sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta,
+                                              sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta,
+                                              sin_teta, cos_teta, sin_teta, cos_teta};
+
+    __asm
+    {
+        mov rax,pInVector
+        mov r8,pOutVector
+
+        // Load into a zmm register of 64 bytes
+        vmovups zmm3, zmmword ptr[cos_sin_teta_vec]
+        vmovups zmm4, zmmword ptr[sin_cos_teta_vec]
+        mov edx, len
+        shl edx, 2
+        xor ecx, ecx
+
+loop1:
+        vmovsldup zmm0, [rax+rcx]
+        vmovshdup zmm1, [rax+rcx]
+        vmulps zmm1, zmm1, zmm4
+        vfmaddsub213ps zmm0, zmm3, zmm1
+
+        // 64 byte store from a zmm register
+        vmovaps [r8+rcx], zmm0
+        vmovsldup zmm0, [rax+rcx+64]
+        vmovshdup zmm1, [rax+rcx+64]
+        vmulps zmm1, zmm1, zmm4
+        vfmaddsub213ps zmm0, zmm3, zmm1
+
+        // offset 64 bytes from previous store
+        vmovaps [r8+rcx+64], zmm0
+
+        // Processed 128-bytes in this loop (the code is unrolled twice)
+        add ecx, 128
+        cmp ecx, edx
+        jl loop1
+    }
+    
+    _mm_free(pInVector);
+    _mm_free(pOutVector);
+    return 0;
+}
 ```
+
+## 17.2 掩码
+
+使用扩展VEX编码模式（EVEX）的Intel AVX-512指令编码了一个谓词操作数，以带条件地控制逐元素的计算操作，并将结果更新到目的操作数。谓词操作数称之为掩码操作（**opmask**）寄存器。掩码操作是一组八个架构寄存器，每个64位。这8个架构寄存器中，只有k1到k7可以被寻址为谓词操作数；k0可被用作为常规的源或目的操作数，但不能被编码为一个谓词操作数。
+
+
 
 <br />
 
