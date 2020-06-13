@@ -432,8 +432,10 @@ int main(void)
     float sin_teta = 0.5;
     
     //Static memory allocation of 8 floats with 32-byte alignments
-    alignas(32) float cos_sin_teta_vec[8] = {cos_teta, sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta, sin_teta};
-    alignas(32) float sin_cos_teta_vec[8] = {sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta};
+    alignas(32) float cos_sin_teta_vec[8] = {cos_teta, sin_teta, cos_teta, sin_teta, 
+                                             cos_teta, sin_teta, cos_teta, sin_teta};
+    alignas(32) float sin_cos_teta_vec[8] = {sin_teta, cos_teta, sin_teta, cos_teta, 
+                                             sin_teta, cos_teta, sin_teta, cos_teta};
 
     //__m256 data type represents a Ymm register with 8 float elements
     __m256 Ymm_cos_sin = _mm256_load_ps(cos_sin_teta_vec);
