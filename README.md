@@ -414,65 +414,60 @@ Intel高级向量扩展512（Intel® AVX-512）是以下所要描述的512位指
 
 Intel AVX2内建代码
 
-```c
+```cpp
 #include <immintrin.h>
-int main()
+int main(void)
 {
-int len = 3200;
-//Dynamic memory allocation with 32byte
-//alignment
-float* pInVector = (float *)
-_mm_malloc(len*sizeof(float),32);
-float* pOutVector = (float *)
-_mm_malloc(len*sizeof(float),32);
-//init data
-for (int i=0; i<len; i++)
-pInVector[i] = 1;
-float cos_teta = 0.8660254037;
-float sin_teta = 0.5;
-//Static memory allocation of 8 floats with 32byte alignments
-__declspec(align(32)) float cos_sin_teta_vec[8] =
-{cos_teta, sin_teta, cos_teta, sin_teta, cos_teta, sin_teta,
-cos_teta, sin_teta};
-__declspec(align(32)) float sin_cos_teta_vec[8] =
-{sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta,
-sin_teta, cos_teta};
-//__m256 data type represents a Ymm
-// register with 8 float elements
-__m256 Ymm_cos_sin =
-_mm256_load_ps(cos_sin_teta_vec);
+    int len = 3200;
+    
+    //Dynamic memory allocation with 32-byte alignment
+    float* pInVector = (float *)_mm_malloc(len*sizeof(float),32);
+    float* pOutVector = (float *)_mm_malloc(len*sizeof(float),32);
+    
+    //init data
+    for (int i=0; i<len; i++)
+        pInVector[i] = 1;
+
+    float cos_teta = 0.8660254037;
+    float sin_teta = 0.5;
+    
+    //Static memory allocation of 8 floats with 32-byte alignments
+    alignas(32) float cos_sin_teta_vec[8] = {cos_teta, sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta, sin_teta};
+    alignas(32) float sin_cos_teta_vec[8] = {sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta};
+
+    //__m256 data type represents a Ymm register with 8 float elements
+    __m256 Ymm_cos_sin = _mm256_load_ps(cos_sin_teta_vec);
+```
 
 Intel AVX-512内建代码
 
-```c
+```cpp
 #include <immintrin.h>
-int main()
+int main(void)
 {
-int len = 3200;
-//Dynamic memory allocation with 64byte
-//alignment
-float* pInVector = (float *)
-_mm_malloc(len*sizeof(float),64);
-float* pOutVector = (float *)
-_mm_malloc(len*sizeof(float),64);
-//init data
-for (int i=0; i<len; i++)
-pInVector[i] = 1;
-float cos_teta = 0.8660254037;
-float sin_teta = 0.5;
-//Static memory allocation of 16 floats with 64byte alignments
-__declspec(align(64)) float cos_sin_teta_vec[16] =
-{cos_teta, sin_teta, cos_teta, sin_teta, cos_teta, sin_teta,
-cos_teta, sin_teta, cos_teta, sin_teta, cos_teta, sin_teta,
-cos_teta, sin_teta, cos_teta, sin_teta};
-__declspec(align(64)) float sin_cos_teta_vec[16] =
-{sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta,
-sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta,
-sin_teta, cos_teta, sin_teta, cos_teta};
-//__m512 data type represents a Zmm
-// register with 16 float elements
-__m512 Zmm_cos_sin =
-_mm512_load_ps(cos_sin_teta_vec);
+    int len = 3200;
+
+    // Dynamic memory allocation with 64-byte alignment
+    float* pInVector = (float *)_mm_malloc(len*sizeof(float),64);
+    float* pOutVector = (float *)_mm_malloc(len*sizeof(float),64);
+
+    //init data
+    for (int i=0; i<len; i++)
+        pInVector[i] = 1;
+
+    float cos_teta = 0.8660254037;
+    float sin_teta = 0.5;
+
+    // Static memory allocation of 16 floats with 64-byte alignments
+    alignas(64) float cos_sin_teta_vec[16] = {cos_teta, sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, 
+                                              cos_teta, sin_teta, cos_teta, sin_teta, cos_teta, sin_teta,
+                                              cos_teta, sin_teta, cos_teta, sin_teta};
+    alignas(64) float sin_cos_teta_vec[16] = {sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta,
+                                              sin_teta, cos_teta, sin_teta, cos_teta, sin_teta, cos_teta,
+                                              sin_teta, cos_teta, sin_teta, cos_teta};
+
+    //__m512 data type represents a Zmm register with 16 float elements
+    __m512 Zmm_cos_sin = _mm512_load_ps(cos_sin_teta_vec);
 ```
 
 <br />
