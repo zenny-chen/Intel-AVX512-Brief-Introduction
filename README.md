@@ -526,4 +526,88 @@ int main(void)
 
 <br />
 
+### 17.1.2 汇编代码
+
+与内建代码的移植准则类似，以下列出汇编代码移植准则：
+
+- 将静态与动态分配的缓存以64字节对齐
+- 对常量使用两倍的补充缓存大小，如果需要的话
+- 对指令名添加一个“**v**”前缀
+- 将寄存器名由`ymm`变为`zmm`
+- 将迭代次数除以2（或将宽度长度翻倍）
+
+Intel AVX2汇编代码
+
+```cpp
+#include <immintrin.h>
+int main(void)
+{
+    int len = 3200;
+
+    //Dynamic memory allocation with 32-byte alignment
+    float* pInVector = (float *)_mm_malloc(len*sizeof(float),32);
+    float* pOutVector = (float *)_mm_malloc(len*sizeof(float),32);
+
+    //init data
+    for (int i=0; i<len; i++)
+        pInVector[i] = 1;
+
+    float cos_teta = 0.8660254037;
+    float sin_teta = 0.5;
+
+    //Static memory allocation of 8 floats with 32byte alignments
+    alignas(32) float cos_sin_teta_vec[8] = {cos_teta, sin_teta, cos_teta, sin_teta, 
+                                             cos_teta, sin_teta, cos_teta, sin_teta};
+    alignas(32) float sin_cos_teta_vec[8] = {sin_teta, cos_teta, sin_teta, cos_teta, 
+                                             sin_teta, cos_teta, sin_teta, cos_teta};
+
+    __asm
+    {
+        mov rax,pInVector
+        mov r8,pOutVector
+
+        // Load into a ymm register of 32 bytes
+        vmovups ymm3,ymmword ptr[cos_sin_teta_vec]
+        vmovups ymm4, ymmword ptr[sin_cos_teta_vec]
+        
+        mov edx, len
+        shl edx, 2
+        xor ecx, ecx
+
+loop1:
+        vmovsldup ymm0, [rax+rcx]
+        vmovshdup ymm1, [rax+rcx]
+        vmulps ymm1, ymm1, ymm4
+        vfmaddsub213ps ymm0, ymm3, ymm1
+
+        // 32-byte store from a ymm register
+        vmovaps [r8+rcx], ymm0
+        vmovsldup ymm0, [rax+rcx+32]
+        vmovshdup ymm1, [rax+rcx+32]
+        vmulps ymm1, ymm1, ymm4
+        vfmaddsub213ps ymm0, ymm3, ymm1
+
+        // offset 32 bytes from previous store
+        vmovaps [r8+rcx+32], ymm0
+
+        // Processed 64bytes in this loop (the code is unrolled twice)
+        add ecx, 64
+        cmp ecx, edx
+        jl loop1
+    }
+
+    _mm_free(pInVector);
+    _mm_free(pOutVector);
+    return 0;
+}
+```
+
+Intel AVX-512汇编代码
+
+```cpp
+
+```
+
+<br />
+
 
