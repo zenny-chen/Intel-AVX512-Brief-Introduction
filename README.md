@@ -412,8 +412,8 @@ Intel高级向量扩展512（Intel® AVX-512）是以下所要描述的512位指
 
 例17-1：用内建函数实现笛卡尔坐标系统旋转
 
-Intel AVX2内建代码 | Intel AVX-512内建代码
----- | ----
+Intel AVX2内建代码
+
 ```c
 #include <immintrin.h>
 int main()
@@ -441,7 +441,9 @@ sin_teta, cos_teta};
 // register with 8 float elements
 __m256 Ymm_cos_sin =
 _mm256_load_ps(cos_sin_teta_vec);
-``` |
+
+Intel AVX-512内建代码
+
 ```c
 #include <immintrin.h>
 int main()
