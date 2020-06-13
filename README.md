@@ -386,5 +386,13 @@ Intel高级向量扩展512（Intel® AVX-512）是以下所要描述的512位指
 - Intel AVX-512双字与四字（位宽的）指令（DQ）——新的QWORD以及计算与转换指令
 - Intel AVX-512向量长度扩展（VL）
 
-<br >
+本章中所列出的性能报告都基于禁用Intel Turbo-Boost技术、且核心与非核心频率设置为1.8GHz的Skylake服务器系统上的数据Cache单元（DCU）驻留数据测量。
+
+<br />
+
+## 17.1 基本的Intel AVX-512 VS AVX2编码
+
+
+
+<br />
 
