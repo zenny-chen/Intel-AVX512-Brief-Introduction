@@ -712,7 +712,38 @@ AVX-512中作为谓词操作数的掩码操作具有以下特性：
 
 以下这些图展示了一个例子，使用融合掩码，将一个寄存器掩码搬移到另一个寄存器。
 
+```asm
+vmovaps zmm1 {k1}, zmm0
+```
 
+在这条指令执行前的目的寄存器的值如下所示：
 
+<br />
+
+![opt-17.2.1-1.JPG](https://github.com/zenny-chen/Intel-AVX512-Brief-Introduction/blob/master/opt-17.2.1-1.JPG)
+
+<br />
+
+操作如下所示：
+
+<br />
+
+![opt-17.2.1-2.JPG](https://github.com/zenny-chen/Intel-AVX512-Brief-Introduction/blob/master/opt-17.2.1-2.JPG)
+
+<br />
+
+带有清零掩码的执行结果如下（注意指令中的 `{z}`）：
+
+```asm
+vmovaps zmm1 {k1}{z}, zmm0
+```
+
+<br />
+
+![opt-17.2.1-3.JPG](https://github.com/zenny-chen/Intel-AVX512-Brief-Introduction/blob/master/opt-17.2.1-3.JPG)
+
+<br />
+
+注意，融合掩码操作具有对目的操作数的依赖性，而清零掩码则没有这种依赖。
 
 
