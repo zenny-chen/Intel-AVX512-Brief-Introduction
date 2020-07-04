@@ -811,3 +811,172 @@ for (int i = 0; i < N; i+=32)
 // 加速2.9倍
 ```
 
+<br />
+
+例17-4：使用汇编的掩码操作：
+
+Intel AVX2汇编代码：
+
+```asm
+loop:
+vmovupd ymm1, ymmword ptr [rax+rcx*8]
+inc r9d
+vmovupd ymm6, ymmword ptr [rax+rcx*8+0x20]
+vmovupd ymm2, ymmword ptr [r11+rcx*8]
+vmovupd ymm7, ymmword ptr [r11+rcx*8+0x20]
+vmovupd ymm11, ymmword ptr [rax+rcx*8+0x40]
+vmovupd ymm12, ymmword ptr [r11+rcx*8+0x40]
+vcmppd ymm4, ymm0, ymm1, 0x1
+vcmppd ymm9, ymm0, ymm6, 0x1
+vcmppd ymm14, ymm0, ymm11, 0x1
+vandpd ymm16, ymm1, ymm4
+vandpd ymm17, ymm6, ymm9
+vmulpd ymm3, ymm16, ymm2
+vmulpd ymm8, ymm17, ymm7
+vmovupd ymm1, ymmword ptr [rax+rcx*8+0x60]
+vmovupd ymm6, ymmword ptr [rax+rcx*8+0x80]
+vblendvpd ymm5, ymm2, ymm3, ymm4
+vblendvpd ymm10, ymm7, ymm8, ymm9
+vmovupd ymm2, ymmword ptr [r11+rcx*8+0x60]
+vmovupd ymm7, ymmword ptr [r11+rcx*8+0x80]
+vmovupd ymmword ptr [rsi+r10*1], ymm5
+vmovupd ymmword ptr [rsi+r10*1+0x20], ymm10
+vcmppd ymm4, ymm0, ymm1, 0x1
+vcmppd ymm9, ymm0, ymm6, 0x1
+vandpd ymm18, ymm11, ymm14
+vandpd ymm19, ymm1, ymm4
+vandpd ymm20, ymm6, ymm9
+vmulpd ymm13, ymm18, ymm12
+vmulpd ymm3, ymm19, ymm2
+vmulpd ymm8, ymm20, ymm7
+vmovupd ymm11, ymmword ptr [rax+rcx*8+0xa0]
+vmovupd ymm1, ymmword ptr [rax+rcx*8+0xc0]
+vmovupd ymm6, ymmword ptr [rax+rcx*8+0xe0]
+vblendvpd ymm15, ymm12, ymm13, ymm14
+vblendvpd ymm5, ymm2, ymm3, ymm4
+vblendvpd ymm10, ymm7, ymm8, ymm9
+vmovupd ymm12, ymmword ptr [r11+rcx*8+0xa0]
+vmovupd ymm2, ymmword ptr [r11+rcx*8+0xc0]
+vmovupd ymm7, ymmword ptr [r11+rcx*8+0xe0]
+vmovupd ymmword ptr [rsi+r10*1+0x40], ymm15
+vmovupd ymmword ptr [rsi+r10*1+0x60], ymm5
+vmovupd ymmword ptr [rsi+r10*1+0x80], ymm10
+vcmppd ymm14, ymm0, ymm11, 0x1
+vcmppd ymm4, ymm0, ymm1, 0x1
+vcmppd ymm9, ymm0, ymm6, 0x1
+vandpd ymm21, ymm11, ymm14
+add rcx, 0x20
+vandpd ymm22, ymm1, ymm4
+vandpd ymm23, ymm6, ymm9
+vmulpd ymm13, ymm21, ymm12
+vmulpd ymm3, ymm22, ymm2
+vmulpd ymm8, ymm23, ymm7
+vblendvpd ymm15, ymm12, ymm13, ymm14
+vblendvpd ymm5, ymm2, ymm3, ymm4
+vblendvpd ymm10, ymm7, ymm8, ymm9
+vmovupd ymmword ptr [rsi+r10*1+0xa0], ymm15
+vmovupd ymmword ptr [rsi+r10*1+0xc0], ymm5
+vmovupd ymmword ptr [rsi+r10*1+0xe0], ymm10
+add rsi, 0x100
+cmp r9d, r8d
+jb loop
+
+; // 基准
+```
+
+Intel AVX-512指令代码：
+
+```asm
+loop:
+vmovups zmm0, zmmword ptr [rax+rcx*8]
+inc r9d
+vmovups zmm2, zmmword ptr [rax+rcx*8+0x40]
+vmovups zmm4, zmmword ptr [rax+rcx*8+0x80]
+vmovups zmm6, zmmword ptr [rax+rcx*8+0xc0]
+vmovups zmm1, zmmword ptr [r11+rcx*8]
+vmovups zmm3, zmmword ptr [r11+rcx*8+0x40]
+vmovups zmm5, zmmword ptr [r11+rcx*8+0x80]
+vmovups zmm7, zmmword ptr [r11+rcx*8+0xc0]
+vcmppd k1, zmm8, zmm0, 0x1
+vcmppd k2, zmm8, zmm2, 0x1
+vcmppd k3, zmm8, zmm4, 0x1
+vcmppd k4, zmm8, zmm6, 0x1
+vmulpd zmm1{k1}, zmm0, zmm1
+vmulpd zmm3{k2}, zmm2, zmm3
+vmulpd zmm5{k3}, zmm4, zmm5
+vmulpd zmm7{k4}, zmm6, zmm7
+vmovups zmmword ptr [rsi+r10*1], zmm1
+vmovups zmmword ptr [rsi+r10*1+0x40], zmm3
+vmovups zmmword ptr [rsi+r10*1+0x80], zmm5
+vmovups zmmword ptr [rsi+r10*1+0xc0], zmm7
+add rcx, 0x20
+add rsi, 0x100
+cmp r9d, r8d
+jb loop
+
+; // 提速2.9倍
+```
+
+<br />
+
+### 17.2.2 掩码开销
+
+使用掩码可能会导致更低的性能，比起相应的非掩码代码。这可能会由于以下场景而导致：
+
+- 对每个加载会有一个额外的混合（blend）操作。
+- 当使用融合掩码时，会产生对目的操作数的依赖。当使用清零掩码时，此依赖不会存在。
+- 更多具有限制性的转运规则。
+
+以下例子展示了使用融合掩码是如何创建了对目的寄存器的依赖的。
+
+表17-1：掩码例子
+
+没有掩码：
+
+```asm
+mov rbx, iter
+loop:
+vmulps zmm0, zmm9, zmm8
+vmulps zmm1, zmm9, zmm8
+dec rbx
+jnle loop
+
+; // 基准
+```
+
+融合掩码：
+
+```asm
+mov rbx, iter
+loop:
+vmulps zmm0{k1}, zmm9, zmm8
+vmulps zmm1{k1}, zmm9, zmm8
+dec rbx
+jnle loop
+
+; // 降速4倍
+```
+
+清零掩码：
+
+```asm
+mov rbx, iter
+loop:
+vmulps zmm0{k1}{z}, zmm9, zmm8
+vmulps zmm1{k1}{z}, zmm9, zmm8
+dec rbx
+jnle loop
+
+; // 与基准相同
+```
+
+不带掩码，处理器在一个双FMA的服务器上执行了每个周期执行了2个乘法。    
+带有融合掩码，处理器每4个周期执行了2个乘法，在迭代N处依赖于迭代N-1的乘法输出。    
+清零融合对目的寄存器并不具有依赖性，从而可以每个周期执行2个乘法。
+
+***建议：*** *掩码具有开销，因此只有在必要时再使用它。尽可能使用清零掩码，而不是融合掩码。*
+
+<br />
+
+### 17.2.3 掩码 vs. 混合（Blending）
+
