@@ -980,3 +980,76 @@ jnle loop
 
 ### 17.2.3 掩码 vs. 混合（Blending）
 
+本小节将讨论对于带有条件的代码使用混合与掩码的优势和劣势。
+
+我们考虑以下代码：
+
+```c
+for ( i=0; i<SIZE; i++ )
+{
+    if ( a[i] > 0 )
+    {
+        b[i] *= 2;
+    }
+    else
+    {
+        b[i] /= 2;
+    }
+}
+```
+
+以下例子展示了对上述代码的两种可能的编译方式。
+- 方案1使用了带有掩码的代码以及对数据的直接算术处理。
+- 方案2将代码分割成两个独立的非掩码流，先处理一个，再处理另一个，然后再使用一个屏蔽搬移（blending），恰好在存放到存储之前。
+
+例子17-5 掩码 vs 混合 例子1
+
+方案1
+
+```asm
+    mov rax, pImage
+    mov rbx, pImage1
+    mov rcx, pOutImage
+    mov rdx, len
+    vpxord zmm0, zmm0, zmm0
+mainloop:
+    vmovdqa32 zmm2, [rax+rdx*4-0x40]
+    vmovdqa32 zmm1, [rbx+rdx*4-0x40]
+    vpcmpgtd k1, zmm0, zmm1
+    knotw k2, k1
+(1) vpslld zmm2 {k1}, zmm2, 1
+(2) vpsrld zmm2 {k2}, zmm2, 1
+(3) vmovdqa32 [rcx+rdx*4-0x40], zmm2
+    sub rdx, 16
+    jne mainloop
+
+; // 基准周期 1x
+; // 基准指令 1x
+```
+
+方案2
+
+```asm
+    mov rax, pImage
+    mov rbx, pImage1
+    mov rcx, pOutImage
+    mov rdx, len
+    vpxord zmm0, zmm0, zmm0
+mainloop:
+    vmovdqa32 zmm2, [rax+rdx*4-0x40]
+    vmovdqa32 zmm1, [rbx+rdx*4-0x40]
+    vpcmpgtd k1, zmm0, zmm1
+    vmovdqa32 zmm3, zmm2
+    vpslld zmm2, zmm2, 1
+    vpsrld zmm3, zmm3, 1
+(1) vmovdqa32 zmm3 {k1}, zmm2
+(2) vmovdqa32 [rcx+rdx*4-0x40], zmm3
+    sub rdx, 16
+    jne mainloop
+
+; // 提速：1.23x
+; // 指令：1.11x
+```
+
+
+
