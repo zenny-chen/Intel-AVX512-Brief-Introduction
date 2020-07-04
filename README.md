@@ -746,4 +746,64 @@ vmovaps zmm1 {k1}{z}, zmm0
 
 注意，融合掩码操作具有对目的操作数的依赖性，而清零掩码则没有这种依赖。
 
+以下代码例子展示了相比起Intel AVX2，Intel AVX-512的掩码是如何用来完成算法的：
+
+```c
+const int N = miBufferWidth;
+const double* restrict a = A;
+const double* restrict b = B;
+double* restrict c = Cref;
+
+for (int i = 0; i < N; i++)
+{
+    double res = b[i];
+    if(a[i] > 1.0){
+        res = res * a[i];
+    }
+    c[i] = res;
+}
+```
+
+例17-3：使用内建函数的掩码操作
+
+Intel AVX2指令代码：
+
+```c
+for (int i = 0; i < N; i+=32)
+{
+    __m256d aa, bb, mask;
+    #pragma unroll(8)
+    for (int j = 0; j < 8; j++)
+    {
+        aa = _mm256_loadu_pd(a+i+j*4);
+        bb = _mm256_loadu_pd(b+i+j*4);
+        mask = _mm256_cmp_pd(_mm256_set1_pd(1.0), aa, 1);
+        aa = _mm256_and_pd(aa, mask); // zero the false values
+        aa = _mm256_mul_pd(aa, bb);
+        bb = _mm256_blendv_pd(bb, aa, mask);
+        _mm256_storeu_pd(c+4*j, bb);
+    }
+    c += 32;
+}
+```
+
+Intel AVX-512指令代码：
+
+```c
+for (int i = 0; i < N; i+=32)
+{
+    __m512d aa, bb;
+    __mmask8 mask;
+    #pragma unroll(4)
+    for (int j = 0; j < 4; j++)
+    {
+        aa = _mm512_loadu_pd(a+i+j*8);
+        bb = _mm512_loadu_pd(b+i+j*8);
+        mask = _mm512_cmp_pd_mask(_mm512_set1_pd(1.0), aa, 1);
+        bb = _mm512_mask_mul_pd(bb, mask, aa, bb);
+        _mm512_storeu_pd(c+8*j, bb);
+    }
+    c += 32;
+}
+```
 
