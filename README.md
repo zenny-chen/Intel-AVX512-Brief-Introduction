@@ -36,9 +36,9 @@ Intel AVX-512指令也支持64位模式下32个SIMD寄存器（XMM0-XMM31，YMM0
 
 #### 15.1.3 八个屏蔽操作寄存器支持
 
-AVX-512指令支持8个屏蔽操作寄存器（k0-k7）。每个屏蔽操作寄存器的宽度在架构上定义为MAX_KL的大小（最大64位）。八个屏蔽操作寄存器的其中七个（k0-k7）可以被用于跟EVEX编码的AVX-512基础指令相结合以提供带条件的执行以及目的操作数中数据元素的高效合并。屏蔽操作寄存器k0的编码一般是在所有数据元素都需要的情况下（即无条件处理）进行使用。此外，屏蔽操作寄存器也被用于向量标志/元素级的向量源以引入新奇的SIMD功能性，比如可以参考**VCOMPRESSPS**。
+AVX-512指令支持8个屏蔽操作寄存器（k0-k7）。每个屏蔽操作寄存器的宽度在架构上定义为MAX_KL的大小（最大64位）。八个屏蔽操作寄存器的其中七个（k1-k7）可以被用于跟EVEX编码的AVX-512基础指令相结合以提供带条件的执行以及目的操作数中数据元素的高效合并。屏蔽操作寄存器k0的编码一般是在所有数据元素都需要的情况下（即无条件处理）进行使用。此外，屏蔽操作寄存器也被用于向量标志/元素级的向量源以引入新奇的SIMD功能性，比如可以参考**VCOMPRESSPS**。
 
-![avx512-register-scheme](https://github.com/zenny-chen/Intel-AVX512-Brief-Introduction/blob/master/avx512-register-scheme.png)
+![avx512-register-scheme](avx512-register-scheme.png)
 
 <br />
 
@@ -396,7 +396,7 @@ Intel高级向量扩展512（Intel® AVX-512）是以下所要描述的512位指
 
 在以下小节中的例子实现了一个笛卡尔坐标系统的旋转。笛卡尔坐标系统中的一个点被描述为(x, y)对。以下图展示了将一个点(x, y)做笛卡尔旋转**θ**角度得到(x', y')的过程。
 
-![图17.2 笛卡尔旋转](https://github.com/zenny-chen/Intel-AVX512-Brief-Introduction/blob/master/CartesianRotation.PNG)
+![图17.2 笛卡尔旋转](CartesianRotation.PNG)
 
 <br />
 
@@ -720,7 +720,7 @@ vmovaps zmm1 {k1}, zmm0
 
 <br />
 
-![opt-17.2.1-1.JPG](https://github.com/zenny-chen/Intel-AVX512-Brief-Introduction/blob/master/opt-17.2.1-1.JPG)
+![opt-17.2.1-1.JPG](opt-17.2.1-1.JPG)
 
 <br />
 
@@ -728,7 +728,7 @@ vmovaps zmm1 {k1}, zmm0
 
 <br />
 
-![opt-17.2.1-2.JPG](https://github.com/zenny-chen/Intel-AVX512-Brief-Introduction/blob/master/opt-17.2.1-2.JPG)
+![opt-17.2.1-2.JPG](opt-17.2.1-2.JPG)
 
 <br />
 
@@ -740,7 +740,7 @@ vmovaps zmm1 {k1}{z}, zmm0
 
 <br />
 
-![opt-17.2.1-3.JPG](https://github.com/zenny-chen/Intel-AVX512-Brief-Introduction/blob/master/opt-17.2.1-3.JPG)
+![opt-17.2.1-3.JPG](opt-17.2.1-3.JPG)
 
 <br />
 
