@@ -3,6 +3,14 @@ Intel AVX-512简介
 
 <br />
 
+## 关于demo
+
+在Windows平台下，安装Visual Studio（至少需要Visual Studio 2019 Community Edition），然后双击 **avx512_demo.sln** 文件直接编译即可。
+
+Linux平台下，打开控制台，进入 **`avx512_demo/avx512_demo/`** 目录，直接使用 **`sh linux_build.sh`** 进行编译即可。倘若当前GCC版本不支持 **`-std=gnu17`**，则可将此编译选项修改为：**`-std=gnu11`**。如果当前环境没有安装GCC，而是用的Clang编译器，则将 **gcc** 命令修改为 **clang** 命令即可。
+
+<br />
+
 ## 15.1 概述
 
 Intel AVX-512家族由一组指令集扩展集构成，包括了AVX-512基础、AVX-512指数与倒数指令、AVX-512冲突、AVX-512预取，以及额外的512位SIMD指令扩展。intel AVX-512指令是对AVX与AVX2的自然扩展。Intel AVX-512引入了下列架构上的提升：
