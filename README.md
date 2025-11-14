@@ -298,6 +298,16 @@ vaddps zmm7 {k6}, zmm2, zmm4, {rd-sae}
 
 上述指令将会执行向量zmm2和zmm4的单精度浮点向量加法，采用舍入到-inf的舍入模式，使用k6作为条件写屏蔽，将结果存放到zmm7。
 
+这里再举一组例子：
+
+```nasm
+    ; 使用不同舍入模式进行加法
+    vaddps zmm2, zmm0, zmm1, {rn-sae}  ; 舍入到最近偶数：1.6+0.5=2.1 → 2.0
+    vaddps zmm3, zmm0, zmm1, {rd-sae}  ; 舍入向负无穷大：2.1 → 2.0
+    vaddps zmm4, zmm0, zmm1, {ru-sae}  ; 舍入向正无穷大：2.1 → 3.0
+    vaddps zmm5, zmm0, zmm1, {rz-sae}  ; 舍入向零：2.1 → 2.0
+```
+
 注意，上述指令执行时MXCSR.RM位被忽略，并且不受该指令执行结果的影响。
 
 对于指令实例，静态舍入模式不被允许的例子如下所示：
@@ -328,7 +338,7 @@ EVEX编码支持一种新的**位移**（***displacement***）表示，可允许
 比如：    
 
 ```asm
-vaddps zmm7, zmm2, disp8[membase + index*8]
+vaddps zmm7, zmm2, disp8[membase + index * 8]
 ```
 
 目的操作数zmm7被更新为一个完整的512位向量，并且64字节的数据从存储器作为一个完整的向量被取出；下一次展开的迭代可能从以64字节为粒度的存储器中取出，对于每次迭代。地址的最低6位可以被压缩，因此 N = 2<sup>6</sup> = 64。“disp8”对有效地址计算所起的作用为：64 * disp8。
